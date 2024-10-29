@@ -1,0 +1,34 @@
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  close_non_owner_issues:
+    runs-on: ubuntu-latest
+    if: github.actor != 'phpcon-odawara-jp'
+    steps:
+      - name: Close Issue if Not Owner
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue_number = context.issue.number;
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              state: "closed"
+            });
+
+      - name: Comment on Closed Issue
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue_number = context.issue.number;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              body: "このIssueはリポジトリオーナー以外によって作成されたため、自動的にクローズされました。"
+            });
