@@ -1,0 +1,28 @@
+name: Issue Notification
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  notification:
+    runs-on: ubuntu-latest
+    if: github.actor == 'phpcon-odawara-jp'
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        with:
+          script: |
+            const anonymousName = context.payload.issue.body.split(/\n/)[2];
+          
+            fetch(process.env.WEBHOOK_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                 value1: context.payload.issue.title,
+                 value2: context.payload.issue.html_url,
+                 value3: anonymousName,
+              }),
+            });
