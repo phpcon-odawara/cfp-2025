@@ -1,3 +1,8 @@
+name: Close Non-Owner Issues
+
+permissions:
+  issues: write
+
 on:
   issues:
     types: [opened]
